@@ -23,6 +23,13 @@ export interface ScheduleSession {
   colorIndex: number;
 }
 
+export interface ScheduleWarning {
+  type: 'no_groups' | 'all_blocked' | 'unavoidable_conflict';
+  subjectId: string;
+  subjectName: string;
+  message: string;
+}
+
 function hasOverlap(a: Session, b: Session): boolean {
   if (a.day !== b.day) return false;
   return a.startHour < b.endHour && b.startHour < a.endHour;
@@ -48,67 +55,113 @@ function hasAfternoons(sessions: ScheduleSession[]): boolean {
   return sessions.some(s => s.startHour >= 15);
 }
 
+/** Check for warnings before generating schedules */
+export function checkWarnings(subjects: Subject[], blockedTimes: TimeBlock[]): ScheduleWarning[] {
+  const warnings: ScheduleWarning[] = [];
+
+  for (const subject of subjects) {
+    if (subject.groups.length === 0) {
+      warnings.push({
+        type: 'no_groups',
+        subjectId: subject.id,
+        subjectName: subject.name,
+        message: `"${subject.name}" no tiene grupos/turnos disponibles y no se puede incluir en el horario.`,
+      });
+      continue;
+    }
+
+    const validGroups = subject.groups.filter(g =>
+      !g.sessions.some(session => isBlockedTime(session, blockedTimes))
+    );
+
+    if (validGroups.length === 0) {
+      warnings.push({
+        type: 'all_blocked',
+        subjectId: subject.id,
+        subjectName: subject.name,
+        message: `Todos los turnos de "${subject.name}" chocan con tus restricciones horarias. Se intentará incluir igualmente, pero habrá conflictos.`,
+      });
+    }
+  }
+
+  return warnings;
+}
+
 export function generateSchedules(
   subjects: Subject[],
   blockedTimes: TimeBlock[],
-  _preferredProfessors: string[] = [],
-  _preferLabMorning: boolean = false,
-): ScheduleOption[] {
-  // For each subject, pick valid groups (not blocked)
-  const validGroupsPerSubject = subjects.map(subject => {
-    return subject.groups.filter(group => {
-      return !group.sessions.some(session => isBlockedTime(session, blockedTimes));
-    });
+): { options: ScheduleOption[]; warnings: ScheduleWarning[] } {
+  const warnings = checkWarnings(subjects, blockedTimes);
+
+  // Filter out subjects with no groups
+  const validSubjects = subjects.filter(s => s.groups.length > 0);
+
+  if (validSubjects.length === 0) {
+    return { options: [], warnings };
+  }
+
+  // For each subject, get valid groups (not blocked), fallback to all
+  const groupsPerSubject = validSubjects.map(subject => {
+    const valid = subject.groups.filter(g =>
+      !g.sessions.some(session => isBlockedTime(session, blockedTimes))
+    );
+    return valid.length > 0 ? valid : subject.groups;
   });
 
-  // Generate combinations (limit to avoid explosion)
+  // Generate combinations via backtracking (limit to avoid explosion)
   const combinations: SubjectGroup[][] = [];
-  
+
   function backtrack(idx: number, current: SubjectGroup[]) {
-    if (combinations.length >= 50) return;
-    if (idx === subjects.length) {
+    if (combinations.length >= 100) return;
+    if (idx === validSubjects.length) {
       combinations.push([...current]);
       return;
     }
-    const groups = validGroupsPerSubject[idx];
-    if (groups.length === 0) {
-      // No valid groups, try all groups anyway
-      for (const g of subjects[idx].groups) {
-        current.push(g);
-        backtrack(idx + 1, current);
-        current.pop();
-      }
-    } else {
-      for (const g of groups) {
-        current.push(g);
-        backtrack(idx + 1, current);
-        current.pop();
-      }
+    for (const g of groupsPerSubject[idx]) {
+      current.push(g);
+      backtrack(idx + 1, current);
+      current.pop();
     }
   }
-  
+
   backtrack(0, []);
+
+  if (combinations.length === 0) {
+    return { options: [], warnings };
+  }
 
   // Score each combination
   const scored = combinations.map((combo, i) => {
     const allSessions: Session[] = combo.flatMap(g => g.sessions);
+
+    // Count overlaps between different subjects
     let conflicts = 0;
-    for (let a = 0; a < allSessions.length; a++) {
-      for (let b = a + 1; b < allSessions.length; b++) {
-        if (hasOverlap(allSessions[a], allSessions[b])) conflicts++;
+    for (let a = 0; a < combo.length; a++) {
+      for (let b = a + 1; b < combo.length; b++) {
+        for (const sa of combo[a].sessions) {
+          for (const sb of combo[b].sessions) {
+            if (hasOverlap(sa, sb)) conflicts++;
+          }
+        }
       }
     }
 
-    const scheduleSessions: ScheduleSession[] = combo.flatMap((group, gi) => 
-      group.sessions.map(s => ({
-        subjectId: subjects[gi].id,
-        subjectName: subjects[gi].name,
+    // Count blocked time violations
+    let blockedViolations = 0;
+    for (const session of allSessions) {
+      if (isBlockedTime(session, blockedTimes)) blockedViolations++;
+    }
+
+    const scheduleSessions: ScheduleSession[] = combo.flatMap((group, gi) =>
+      group.sessions.map(sess => ({
+        subjectId: validSubjects[gi].id,
+        subjectName: validSubjects[gi].name,
         groupName: group.name,
         professor: group.professor,
         type: group.type,
-        day: s.day,
-        startHour: s.startHour,
-        endHour: s.endHour,
+        day: sess.day,
+        startHour: sess.startHour,
+        endHour: sess.endHour,
         colorIndex: gi,
       }))
     );
@@ -116,22 +169,19 @@ export function generateSchedules(
     const gaps = countGaps(scheduleSessions);
     const afternoons = hasAfternoons(scheduleSessions);
 
-    // Score: lower is better. Conflicts heavily penalized.
-    const score = conflicts * 100 + gaps * 5 + (afternoons ? 10 : 0);
+    const score = conflicts * 200 + blockedViolations * 150 + gaps * 5 + (afternoons ? 10 : 0);
 
     return {
       id: `option-${i}`,
-      conflicts,
+      conflicts: conflicts + blockedViolations,
       gaps,
       score,
       afternoons,
-      selections: combo.map((g, gi) => ({ subjectId: subjects[gi].id, groupId: g.id })),
+      selections: combo.map((g, gi) => ({ subjectId: validSubjects[gi].id, groupId: g.id })),
       sessions: scheduleSessions,
-      combo,
     };
   });
 
-  // Sort by score, take top options
   scored.sort((a, b) => a.score - b.score);
 
   const results: ScheduleOption[] = [];
@@ -171,9 +221,9 @@ export function generateSchedules(
     });
   }
 
-  // If we have less than 2, add another variant
+  // Alternative
   if (results.length < 2 && scored.length > 1) {
-    const alt = scored[1];
+    const alt = scored.find(s => s.id !== best?.id) || scored[1];
     results.push({
       ...alt,
       id: 'alternative',
@@ -184,5 +234,36 @@ export function generateSchedules(
     });
   }
 
-  return results;
+  // Detect unavoidable conflicts between subject pairs
+  if (!scored.some(s => s.conflicts === 0)) {
+    // Find which subject pairs always conflict
+    for (let a = 0; a < validSubjects.length; a++) {
+      for (let b = a + 1; b < validSubjects.length; b++) {
+        let alwaysConflict = true;
+        for (const ga of groupsPerSubject[a]) {
+          for (const gb of groupsPerSubject[b]) {
+            let pairConflict = false;
+            for (const sa of ga.sessions) {
+              for (const sb of gb.sessions) {
+                if (hasOverlap(sa, sb)) { pairConflict = true; break; }
+              }
+              if (pairConflict) break;
+            }
+            if (!pairConflict) { alwaysConflict = false; break; }
+          }
+          if (!alwaysConflict) break;
+        }
+        if (alwaysConflict) {
+          warnings.push({
+            type: 'unavoidable_conflict',
+            subjectId: validSubjects[a].id,
+            subjectName: `${validSubjects[a].name} + ${validSubjects[b].name}`,
+            message: `"${validSubjects[a].name}" y "${validSubjects[b].name}" tienen solapamiento en TODOS los turnos disponibles. Considera cursar una de ellas en otro cuatrimestre.`,
+          });
+        }
+      }
+    }
+  }
+
+  return { options: results, warnings };
 }
