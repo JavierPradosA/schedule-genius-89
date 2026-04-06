@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Subject, TimeBlock } from '@/data/demoData';
-import { generateSchedules, ScheduleOption } from '@/lib/scheduleGenerator';
+import { generateSchedules, ScheduleOption, ScheduleWarning } from '@/lib/scheduleGenerator';
 import WeekCalendar from '@/components/WeekCalendar';
 import { ArrowLeft, Check, AlertTriangle, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -14,7 +14,7 @@ interface StepResultsProps {
 }
 
 const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsProps) => {
-  const options = useMemo(() => generateSchedules(subjects, blockedTimes), [subjects, blockedTimes]);
+  const { options, warnings } = useMemo(() => generateSchedules(subjects, blockedTimes), [subjects, blockedTimes]);
   const [selectedIdx, setSelectedIdx] = useState(0);
 
   if (options.length === 0) {
@@ -24,9 +24,19 @@ const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsPr
         <h2 className="font-display text-2xl font-bold text-foreground mb-2">
           No se encontraron combinaciones válidas
         </h2>
-        <p className="text-muted-foreground mb-6">
+        <p className="text-muted-foreground mb-4">
           Prueba a modificar tus restricciones horarias o seleccionar menos asignaturas.
         </p>
+        {warnings.length > 0 && (
+          <div className="text-left max-w-md mx-auto mb-6 space-y-2">
+            {warnings.map((w, i) => (
+              <div key={i} className="flex items-start gap-2 bg-destructive/10 border border-destructive/30 rounded-lg p-3">
+                <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-foreground">{w.message}</p>
+              </div>
+            ))}
+          </div>
+        )}
         <Button variant="outline" onClick={onBack}>
           <ArrowLeft className="w-4 h-4 mr-1" /> Modificar preferencias
         </Button>
@@ -44,6 +54,18 @@ const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsPr
       <p className="text-muted-foreground mb-6">
         Hemos generado {options.length} opción(es) optimizadas para ti.
       </p>
+
+      {/* Warnings */}
+      {warnings.length > 0 && (
+        <div className="space-y-2 mb-6">
+          {warnings.map((w, i) => (
+            <div key={i} className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+              <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-foreground">{w.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Option tabs */}
       <div className="flex flex-wrap gap-3 mb-6">
@@ -77,7 +99,7 @@ const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsPr
             {current.id === 'compact' && 'Minimiza los huecos muertos entre clases, concentrando tu jornada.'}
             {current.id === 'mornings' && 'Todas las clases son por la mañana, dejando las tardes completamente libres.'}
             {current.id === 'minimal-gaps' && 'Prioriza la menor cantidad de tiempo perdido entre clases.'}
-            {current.id === 'alternative' && 'Una alternativa válida con diferente distribución de grupos.'}
+            {current.id === 'alternative' && 'Una alternativa válida con diferente distribución de turnos.'}
           </p>
         </motion.div>
       )}
