@@ -1,4 +1,4 @@
-import { DAYS, HOURS, getSubjectColor } from '@/data/demoData';
+import { DAYS, TIME_BLOCKS, getSubjectColor } from '@/data/demoData';
 import { ScheduleSession } from '@/lib/scheduleGenerator';
 
 interface WeekCalendarProps {
@@ -7,8 +7,15 @@ interface WeekCalendarProps {
 }
 
 const WeekCalendar = ({ sessions, compact = false }: WeekCalendarProps) => {
-  const hourHeight = compact ? 36 : 48;
+  const blockHeight = compact ? 36 : 56;
   const headerHeight = 40;
+
+  // Determine which time blocks are needed
+  const allHours = sessions.map(s => [s.startHour, s.endHour]).flat();
+  const minHour = allHours.length > 0 ? Math.min(...allHours) : 8;
+  const maxHour = allHours.length > 0 ? Math.max(...allHours) : 14;
+
+  const visibleBlocks = TIME_BLOCKS.filter(b => b.start >= minHour - 2 && b.end <= maxHour + 2);
 
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
@@ -29,13 +36,13 @@ const WeekCalendar = ({ sessions, compact = false }: WeekCalendarProps) => {
         <div className="relative grid grid-cols-6">
           {/* Time column */}
           <div className="border-r border-border">
-            {HOURS.map(hour => (
+            {visibleBlocks.map(block => (
               <div
-                key={hour}
-                className="flex items-start justify-center border-b border-border/50 px-1 pt-1 text-xs text-muted-foreground"
-                style={{ height: hourHeight }}
+                key={block.start}
+                className="flex items-center justify-center border-b border-border/50 px-1 text-[10px] text-muted-foreground"
+                style={{ height: blockHeight }}
               >
-                {hour}:00
+                {block.label}
               </div>
             ))}
           </div>
@@ -43,17 +50,20 @@ const WeekCalendar = ({ sessions, compact = false }: WeekCalendarProps) => {
           {/* Day columns */}
           {[0, 1, 2, 3, 4].map(dayIdx => (
             <div key={dayIdx} className="relative border-r border-border last:border-r-0">
-              {/* Hour grid lines */}
-              {HOURS.map(hour => (
-                <div key={hour} className="border-b border-border/30" style={{ height: hourHeight }} />
+              {/* Block grid lines */}
+              {visibleBlocks.map(block => (
+                <div key={block.start} className="border-b border-border/30" style={{ height: blockHeight }} />
               ))}
 
               {/* Sessions */}
               {sessions
                 .filter(s => s.day === dayIdx)
                 .map((session, i) => {
-                  const top = (session.startHour - 8) * hourHeight;
-                  const height = (session.endHour - session.startHour) * hourHeight;
+                  const blockIdx = visibleBlocks.findIndex(b => b.start === session.startHour);
+                  if (blockIdx === -1) return null;
+                  const spanBlocks = visibleBlocks.filter(b => b.start >= session.startHour && b.end <= session.endHour).length || 1;
+                  const top = blockIdx * blockHeight;
+                  const height = spanBlocks * blockHeight;
                   const color = getSubjectColor(session.colorIndex);
 
                   return (
@@ -71,11 +81,8 @@ const WeekCalendar = ({ sessions, compact = false }: WeekCalendarProps) => {
                       <div className="font-semibold truncate text-[10px] leading-tight">
                         {session.subjectName}
                       </div>
-                      {!compact && height > hourHeight && (
-                        <>
-                          <div className="truncate text-[9px] opacity-80">{session.groupName}</div>
-                          <div className="truncate text-[9px] opacity-70">{session.professor}</div>
-                        </>
+                      {!compact && (
+                        <div className="truncate text-[9px] opacity-80">{session.groupName}</div>
                       )}
                     </div>
                   );

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { DAYS, HOURS, TimeBlock } from '@/data/demoData';
+import { DAYS, TIME_BLOCKS, TimeBlock } from '@/data/demoData';
 import { ArrowLeft, ArrowRight, Ban } from 'lucide-react';
 
 interface StepPreferencesProps {
@@ -10,23 +10,37 @@ interface StepPreferencesProps {
 }
 
 const StepPreferences = ({ blockedTimes, setBlockedTimes, onNext, onBack }: StepPreferencesProps) => {
-  const isBlocked = (day: number, hour: number) =>
-    blockedTimes.some(b => b.day === day && b.startHour === hour);
+  const isBlocked = (day: number, startHour: number) =>
+    blockedTimes.some(b => b.day === day && b.startHour === startHour);
 
-  const toggleBlock = (day: number, hour: number) => {
-    if (isBlocked(day, hour)) {
-      setBlockedTimes(blockedTimes.filter(b => !(b.day === day && b.startHour === hour)));
+  const toggleBlock = (day: number, block: typeof TIME_BLOCKS[number]) => {
+    if (isBlocked(day, block.start)) {
+      setBlockedTimes(blockedTimes.filter(b => !(b.day === day && b.startHour === block.start)));
     } else {
-      setBlockedTimes([...blockedTimes, { day: day as TimeBlock['day'], startHour: hour, endHour: hour + 1 }]);
+      setBlockedTimes([...blockedTimes, { day: day as TimeBlock['day'], startHour: block.start, endHour: block.end }]);
     }
   };
 
   const blockAfternoons = () => {
+    const afternoonBlocks = TIME_BLOCKS.filter(b => b.start >= 15);
     const newBlocks: TimeBlock[] = [];
     for (let d = 0; d < 5; d++) {
-      for (let h = 15; h < 20; h++) {
-        if (!isBlocked(d, h)) {
-          newBlocks.push({ day: d as TimeBlock['day'], startHour: h, endHour: h + 1 });
+      for (const block of afternoonBlocks) {
+        if (!isBlocked(d, block.start)) {
+          newBlocks.push({ day: d as TimeBlock['day'], startHour: block.start, endHour: block.end });
+        }
+      }
+    }
+    setBlockedTimes([...blockedTimes, ...newBlocks]);
+  };
+
+  const blockMornings = () => {
+    const morningBlocks = TIME_BLOCKS.filter(b => b.start < 15);
+    const newBlocks: TimeBlock[] = [];
+    for (let d = 0; d < 5; d++) {
+      for (const block of morningBlocks) {
+        if (!isBlocked(d, block.start)) {
+          newBlocks.push({ day: d as TimeBlock['day'], startHour: block.start, endHour: block.end });
         }
       }
     }
@@ -49,6 +63,9 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, onNext, onBack }: Step
         <Button variant="outline" size="sm" onClick={blockAfternoons}>
           <Ban className="w-3 h-3 mr-1" /> Bloquear tardes
         </Button>
+        <Button variant="outline" size="sm" onClick={blockMornings}>
+          <Ban className="w-3 h-3 mr-1" /> Bloquear mañanas
+        </Button>
         <Button variant="outline" size="sm" onClick={clearAll}>
           Limpiar todo
         </Button>
@@ -65,19 +82,19 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, onNext, onBack }: Step
             ))}
           </div>
 
-          {/* Time slots */}
-          {HOURS.map(hour => (
-            <div key={hour} className="grid grid-cols-6 border-b border-border/50 last:border-b-0">
-              <div className="p-2 text-center text-xs text-muted-foreground flex items-center justify-center">
-                {hour}:00
+          {/* Time blocks */}
+          {TIME_BLOCKS.map(block => (
+            <div key={block.start} className="grid grid-cols-6 border-b border-border/50 last:border-b-0">
+              <div className="p-2 text-center text-[11px] text-muted-foreground flex items-center justify-center">
+                {block.label}
               </div>
               {[0, 1, 2, 3, 4].map(day => {
-                const blocked = isBlocked(day, hour);
+                const blocked = isBlocked(day, block.start);
                 return (
                   <button
                     key={day}
-                    onClick={() => toggleBlock(day, hour)}
-                    className={`h-10 border-l border-border/30 transition-colors ${
+                    onClick={() => toggleBlock(day, block)}
+                    className={`h-12 border-l border-border/30 transition-colors ${
                       blocked
                         ? 'bg-destructive/20 hover:bg-destructive/30'
                         : 'hover:bg-muted/60'
