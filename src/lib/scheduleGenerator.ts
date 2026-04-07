@@ -174,7 +174,8 @@ export function generateSchedules(
 
     return {
       id: `option-${i}`,
-      conflicts: conflicts + blockedViolations,
+      conflicts,
+      blockedViolations,
       gaps,
       score,
       afternoons,
