@@ -220,7 +220,7 @@ const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsPr
 
       {/* Calendar */}
       <div className="mb-8">
-        <WeekCalendar sessions={current.sessions} />
+        <WeekCalendar sessions={current.sessions} blockedTimes={blockedTimes} />
       </div>
 
       {/* Navigation */}
