@@ -6,6 +6,7 @@ export interface ScheduleOption {
   description: string;
   score: number;
   conflicts: number;
+  blockedViolations: number;
   gaps: number;
   selections: { subjectId: string; groupId: string }[];
   sessions: ScheduleSession[];
