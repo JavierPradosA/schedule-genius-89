@@ -209,18 +209,27 @@ const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsPr
         </motion.div>
       )}
 
+      {current.blockedViolations > 0 && (
+        <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
+          <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-foreground">
+            Este horario tiene <strong>{current.blockedViolations} clase(s) en franjas que bloqueaste</strong> porque no existe ningún turno que las evite. Se marcan con ⚠ en el calendario.
+          </p>
+        </div>
+      )}
+
       {current.conflicts > 0 && (
         <div className="flex items-start gap-2 bg-destructive/10 border border-destructive/30 rounded-lg p-3 mb-4">
           <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
           <p className="text-sm text-foreground">
-            Este horario tiene <strong>{current.conflicts} solapamiento(s)</strong>. Considera modificar tus asignaturas o restricciones.
+            Este horario tiene <strong>{current.conflicts} solapamiento(s)</strong> entre asignaturas. Considera modificar tu selección.
           </p>
         </div>
       )}
 
       {/* Calendar */}
       <div className="mb-8">
-        <WeekCalendar sessions={current.sessions} />
+        <WeekCalendar sessions={current.sessions} blockedTimes={blockedTimes} />
       </div>
 
       {/* Navigation */}

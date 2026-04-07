@@ -6,6 +6,7 @@ export interface ScheduleOption {
   description: string;
   score: number;
   conflicts: number;
+  blockedViolations: number;
   gaps: number;
   selections: { subjectId: string; groupId: string }[];
   sessions: ScheduleSession[];
@@ -173,7 +174,8 @@ export function generateSchedules(
 
     return {
       id: `option-${i}`,
-      conflicts: conflicts + blockedViolations,
+      conflicts,
+      blockedViolations,
       gaps,
       score,
       afternoons,
@@ -187,15 +189,19 @@ export function generateSchedules(
   const results: ScheduleOption[] = [];
 
   // Best compact
-  const best = scored.find(s => s.conflicts === 0) || scored[0];
+  const best = scored.find(s => s.conflicts === 0 && s.blockedViolations === 0) || scored.find(s => s.conflicts === 0) || scored[0];
   if (best) {
+    const parts: string[] = [];
+    if (best.conflicts > 0) parts.push(`⚠️ ${best.conflicts} solapamiento(s)`);
+    if (best.blockedViolations > 0) parts.push(`🚫 ${best.blockedViolations} clase(s) en horario bloqueado`);
+    if (best.conflicts === 0 && best.blockedViolations === 0) parts.push('Sin conflictos');
+    parts.push(`${best.gaps}h de huecos`);
+
     results.push({
       ...best,
       id: 'compact',
       label: '⚡ Horario más compacto',
-      description: best.conflicts === 0
-        ? `Sin solapamientos · ${best.gaps}h de huecos semanales`
-        : `⚠️ ${best.conflicts} solapamiento(s) · ${best.gaps}h de huecos`,
+      description: parts.join(' · '),
     });
   }
 
