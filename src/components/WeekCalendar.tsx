@@ -1,6 +1,7 @@
 import { DAYS, TIME_BLOCKS, TimeBlock, getSubjectColor } from '@/data/demoData';
 import { ScheduleSession } from '@/lib/scheduleGenerator';
-import { Ban } from 'lucide-react';
+import { Ban, AlertTriangle } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface WeekCalendarProps {
   sessions: ScheduleSession[];
@@ -74,39 +75,93 @@ const WeekCalendar = ({ sessions, blockedTimes = [], compact = false }: WeekCale
                 );
               })}
 
-              {/* Sessions */}
-              {sessions
-                .filter(s => s.day === dayIdx)
-                .map((session, i) => {
-                  const blockIdx = visibleBlocks.findIndex(b => b.start === session.startHour);
-                  if (blockIdx === -1) return null;
-                  const spanBlocks = visibleBlocks.filter(b => b.start >= session.startHour && b.end <= session.endHour).length || 1;
-                  const top = blockIdx * blockHeight;
-                  const height = spanBlocks * blockHeight;
-                  const color = getSubjectColor(session.colorIndex);
-                  const onBlockedTime = isBlocked(dayIdx, session.startHour, session.endHour);
+              {/* Sessions with overlap detection */}
+              {(() => {
+                const daySessions = sessions.filter(s => s.day === dayIdx);
+                
+                // Find overlapping groups
+                const overlapGroups: ScheduleSession[][] = [];
+                const assigned = new Set<number>();
+                
+                for (let i = 0; i < daySessions.length; i++) {
+                  if (assigned.has(i)) continue;
+                  const group = [daySessions[i]];
+                  assigned.add(i);
+                  for (let j = i + 1; j < daySessions.length; j++) {
+                    if (assigned.has(j)) continue;
+                    // Check if j overlaps with any in the group
+                    const overlaps = group.some(
+                      g => g.startHour < daySessions[j].endHour && daySessions[j].startHour < g.endHour
+                    );
+                    if (overlaps) {
+                      group.push(daySessions[j]);
+                      assigned.add(j);
+                    }
+                  }
+                  overlapGroups.push(group);
+                }
 
-                  return (
-                    <div
-                      key={`${session.subjectId}-${i}`}
-                      className={`absolute inset-x-0.5 rounded-md px-1.5 py-1 text-xs overflow-hidden transition-transform hover:scale-[1.02] hover:z-10 ${onBlockedTime ? 'ring-2 ring-destructive ring-offset-1' : ''}`}
-                      style={{
-                        top,
-                        height,
-                        backgroundColor: color,
-                        color: 'white',
-                        opacity: onBlockedTime ? 0.7 : 0.92,
-                      }}
-                    >
-                      <div className="font-semibold truncate text-[10px] leading-tight">
-                        {onBlockedTime && '⚠ '}{session.subjectName}
-                      </div>
-                      {!compact && (
-                        <div className="truncate text-[9px] opacity-80">{session.groupName}</div>
-                      )}
-                    </div>
-                  );
-                })}
+                return overlapGroups.flatMap(group => {
+                  const isOverlap = group.length > 1;
+                  return group.map((session, posInGroup) => {
+                    const blockIdx = visibleBlocks.findIndex(b => b.start === session.startHour);
+                    if (blockIdx === -1) return null;
+                    const spanBlocks = visibleBlocks.filter(b => b.start >= session.startHour && b.end <= session.endHour).length || 1;
+                    const top = blockIdx * blockHeight;
+                    const height = spanBlocks * blockHeight;
+                    const color = getSubjectColor(session.colorIndex);
+                    const onBlockedTime = isBlocked(dayIdx, session.startHour, session.endHour);
+
+                    // Side-by-side layout for overlaps
+                    const width = isOverlap ? `calc(${100 / group.length}% - 2px)` : 'calc(100% - 4px)';
+                    const left = isOverlap ? `calc(${(posInGroup * 100) / group.length}% + 1px)` : '2px';
+
+                    return (
+                      <TooltipProvider key={`${session.subjectId}-${session.startHour}-${posInGroup}`}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`absolute rounded-md px-1 py-0.5 text-xs overflow-hidden transition-transform hover:scale-[1.03] hover:z-20 cursor-default
+                                ${isOverlap ? 'ring-2 ring-destructive/70 ring-offset-1 z-10' : ''}
+                                ${onBlockedTime ? 'ring-2 ring-destructive ring-offset-1' : ''}`}
+                              style={{
+                                top,
+                                height,
+                                width,
+                                left,
+                                backgroundColor: color,
+                                color: 'white',
+                                opacity: onBlockedTime ? 0.7 : 0.95,
+                              }}
+                            >
+                              {isOverlap && (
+                                <div className="absolute -top-1.5 -right-1.5 bg-destructive rounded-full p-0.5 z-20">
+                                  <AlertTriangle className="w-2.5 h-2.5 text-destructive-foreground" />
+                                </div>
+                              )}
+                              <div className="font-semibold truncate text-[10px] leading-tight">
+                                {onBlockedTime && '⚠ '}{session.subjectName}
+                              </div>
+                              {!compact && (
+                                <div className="truncate text-[9px] opacity-80">{session.groupName}</div>
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className={isOverlap ? 'border-destructive bg-destructive/10' : ''}>
+                            <p className="font-semibold">{session.subjectName}</p>
+                            <p className="text-xs">{session.groupName} — {session.professor}</p>
+                            {isOverlap && (
+                              <p className="text-xs text-destructive font-medium mt-1">
+                                ⚠ Solapamiento con: {group.filter(g => g !== session).map(g => g.subjectName).join(', ')}
+                              </p>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    );
+                  });
+                });
+              })()}
             </div>
           ))}
         </div>
