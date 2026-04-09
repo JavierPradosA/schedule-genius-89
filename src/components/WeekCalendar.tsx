@@ -1,6 +1,6 @@
 import { DAYS, TIME_BLOCKS, TimeBlock, getSubjectColor } from '@/data/demoData';
 import { ScheduleSession } from '@/lib/scheduleGenerator';
-import { Ban, AlertTriangle } from 'lucide-react';
+import { Ban } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface WeekCalendarProps {
