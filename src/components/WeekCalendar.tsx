@@ -122,8 +122,8 @@ const WeekCalendar = ({ sessions, blockedTimes = [], compact = false }: WeekCale
                           <TooltipTrigger asChild>
                             <div
                               className={`absolute rounded-md px-1 py-0.5 text-xs overflow-hidden transition-transform hover:scale-[1.03] hover:z-20 cursor-default
-                                ${isOverlap ? 'ring-2 ring-destructive/70 ring-offset-1 z-10' : ''}
-                                ${onBlockedTime ? 'ring-2 ring-destructive ring-offset-1' : ''}`}
+                                ${isOverlap ? 'border border-dashed border-destructive/40' : ''}
+                                ${onBlockedTime ? 'border border-dashed border-destructive/40' : ''}`}
                               style={{
                                 top,
                                 height,
@@ -131,28 +131,23 @@ const WeekCalendar = ({ sessions, blockedTimes = [], compact = false }: WeekCale
                                 left,
                                 backgroundColor: color,
                                 color: 'white',
-                                opacity: onBlockedTime ? 0.7 : 0.95,
+                                opacity: onBlockedTime ? 0.75 : 0.92,
                               }}
                             >
-                              {isOverlap && (
-                                <div className="absolute -top-1.5 -right-1.5 bg-destructive rounded-full p-0.5 z-20">
-                                  <AlertTriangle className="w-2.5 h-2.5 text-destructive-foreground" />
-                                </div>
-                              )}
                               <div className="font-semibold truncate text-[10px] leading-tight">
-                                {onBlockedTime && '⚠ '}{session.subjectName}
+                                {session.subjectName}
                               </div>
                               {!compact && (
                                 <div className="truncate text-[9px] opacity-80">{session.groupName}</div>
                               )}
                             </div>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className={isOverlap ? 'border-destructive bg-destructive/10' : ''}>
+                          <TooltipContent side="top">
                             <p className="font-semibold">{session.subjectName}</p>
-                            <p className="text-xs">{session.groupName} — {session.professor}</p>
+                            <p className="text-xs text-muted-foreground">{session.groupName} — {session.professor}</p>
                             {isOverlap && (
-                              <p className="text-xs text-destructive font-medium mt-1">
-                                ⚠ Solapamiento con: {group.filter(g => g !== session).map(g => g.subjectName).join(', ')}
+                              <p className="text-xs text-destructive/80 mt-1">
+                                Solapamiento con: {group.filter(g => g !== session).map(g => g.subjectName).join(', ')}
                               </p>
                             )}
                           </TooltipContent>
