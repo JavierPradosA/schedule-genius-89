@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import StepLanding from '@/components/steps/StepLanding';
 import StepSelection from '@/components/steps/StepSelection';
 import StepPreferences from '@/components/steps/StepPreferences';
+import { ProfessorPreferences } from '@/components/steps/StepPreferences';
 import StepResults from '@/components/steps/StepResults';
 import StepSummary from '@/components/steps/StepSummary';
 import { Subject, TimeBlock } from '@/data/demoData';
@@ -15,6 +16,7 @@ const Index = () => {
   const [degree, setDegree] = useState('');
   const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
   const [blockedTimes, setBlockedTimes] = useState<TimeBlock[]>([]);
+  const [professorPrefs, setProfessorPrefs] = useState<ProfessorPreferences>({});
   const [chosenSchedule, setChosenSchedule] = useState<ScheduleOption | null>(null);
 
   const next = () => setStep(s => Math.min(s + 1, 4));
@@ -75,6 +77,9 @@ const Index = () => {
             <StepPreferences
               blockedTimes={blockedTimes}
               setBlockedTimes={setBlockedTimes}
+              selectedSubjects={selectedSubjects}
+              professorPrefs={professorPrefs}
+              setProfessorPrefs={setProfessorPrefs}
               onNext={next}
               onBack={prev}
             />
@@ -83,6 +88,7 @@ const Index = () => {
             <StepResults
               subjects={selectedSubjects}
               blockedTimes={blockedTimes}
+              professorPrefs={professorPrefs}
               onChoose={(schedule) => {
                 setChosenSchedule(schedule);
                 next();

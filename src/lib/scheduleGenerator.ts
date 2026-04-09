@@ -91,6 +91,7 @@ export function checkWarnings(subjects: Subject[], blockedTimes: TimeBlock[]): S
 export function generateSchedules(
   subjects: Subject[],
   blockedTimes: TimeBlock[],
+  professorPrefs?: Record<string, string | undefined>,
 ): { options: ScheduleOption[]; warnings: ScheduleWarning[] } {
   const warnings = checkWarnings(subjects, blockedTimes);
 
@@ -170,7 +171,18 @@ export function generateSchedules(
     const gaps = countGaps(scheduleSessions);
     const afternoons = hasAfternoons(scheduleSessions);
 
-    const score = conflicts * 200 + blockedViolations * 150 + gaps * 5 + (afternoons ? 10 : 0);
+    // Count professor preference mismatches
+    let profMismatches = 0;
+    if (professorPrefs) {
+      for (let gi = 0; gi < combo.length; gi++) {
+        const pref = professorPrefs[validSubjects[gi].id];
+        if (pref && combo[gi].professor !== pref) {
+          profMismatches++;
+        }
+      }
+    }
+
+    const score = conflicts * 200 + blockedViolations * 150 + profMismatches * 50 + gaps * 5 + (afternoons ? 10 : 0);
 
     return {
       id: `option-${i}`,
