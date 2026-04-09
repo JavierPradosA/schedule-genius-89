@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Subject, TimeBlock } from '@/data/demoData';
 import { generateSchedules, ScheduleOption } from '@/lib/scheduleGenerator';
+import { ProfessorPreferences } from '@/components/steps/StepPreferences';
 import WeekCalendar from '@/components/WeekCalendar';
 import { ArrowLeft, Check, AlertTriangle, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,6 +10,7 @@ import { motion } from 'framer-motion';
 interface StepResultsProps {
   subjects: Subject[];
   blockedTimes: TimeBlock[];
+  professorPrefs?: ProfessorPreferences;
   onChoose: (schedule: ScheduleOption) => void;
   onBack: () => void;
 }
@@ -48,7 +50,7 @@ function getSubjectsForSemester(subjects: Subject[], semester: SemesterKey): Sub
   });
 }
 
-const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsProps) => {
+const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack }: StepResultsProps) => {
   const semesterResults = useMemo(() => {
     const semesters = (['C1', 'C2'] as SemesterKey[]).filter((semester) =>
       subjects.some((subject) => subject.semester === semester || subject.semester === 'A')
@@ -57,9 +59,9 @@ const StepResults = ({ subjects, blockedTimes, onChoose, onBack }: StepResultsPr
     return semesters.map((semester) => ({
       semester,
       label: SEMESTER_LABELS[semester],
-      ...generateSchedules(getSubjectsForSemester(subjects, semester), blockedTimes),
+      ...generateSchedules(getSubjectsForSemester(subjects, semester), blockedTimes, professorPrefs),
     }));
-  }, [subjects, blockedTimes]);
+  }, [subjects, blockedTimes, professorPrefs]);
 
   const [activeSemester, setActiveSemester] = useState<SemesterKey>('C1');
   const [selectedIdxBySemester, setSelectedIdxBySemester] = useState<Record<SemesterKey, number>>({ C1: 0, C2: 0 });
