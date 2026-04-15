@@ -17,7 +17,7 @@ interface StepPreferencesProps {
 }
 
 const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, professorPrefs, setProfessorPrefs, onNext, onBack }: StepPreferencesProps) => {
-  const [showProfessors, setShowProfessors] = useState(false);
+  const [showProfessors, setShowProfessors] = useState(true);
 
   const isBlocked = (day: number, startHour: number) =>
     blockedTimes.some(b => b.day === day && b.startHour === startHour);
