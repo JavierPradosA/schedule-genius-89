@@ -77,6 +77,14 @@ function s(day: D, startHour: number, endHour: number): Session {
 }
 
 // Helper to build groups from turn-based schedule data
+const PROFESSOR_NAMES = [
+  'Prof. García', 'Prof. Martínez', 'Prof. López', 'Prof. Rodríguez',
+  'Prof. Fernández', 'Prof. Sánchez', 'Prof. Pérez', 'Prof. Gómez',
+  'Prof. Ruiz', 'Prof. Díaz', 'Prof. Moreno', 'Prof. Álvarez',
+];
+
+let profCounter = 0;
+
 function buildGroups(
   id: string,
   turns: { name: string; sessions: Session[] }[],
@@ -84,7 +92,7 @@ function buildGroups(
   return turns.map((t, i) => ({
     id: `${id}-${t.name.toLowerCase().replace(/\s/g, '')}`,
     name: t.name,
-    professor: '',
+    professor: PROFESSOR_NAMES[(profCounter++) % PROFESSOR_NAMES.length],
     type: 'theory' as const,
     sessions: t.sessions,
   }));
