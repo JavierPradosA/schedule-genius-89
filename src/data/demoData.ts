@@ -99,7 +99,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
   giti: [
     // ============ CURSO 1 - C1 ============
     {
-      id: 'ffi', name: 'Fundamentos Físicos de la Informática', code: '2060009', credits: 6,
+      id: 'ffi', name: 'Asignatura 1', code: '2060009', credits: 6,
       course: 1, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('ffi', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(1,10,12), s(3,12,14), s(0,12,14)] },
@@ -108,7 +108,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'imd', name: 'Introducción a la Matemática Discreta', code: '2060005', credits: 6,
+      id: 'imd', name: 'Asignatura 2', code: '2060005', credits: 6,
       course: 1, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('imd', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(3,10,12), s(4,10,12)] },
@@ -117,7 +117,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'ced', name: 'Circuitos Electrónicos Digitales', code: '2060004', credits: 6,
+      id: 'ced', name: 'Asignatura 3', code: '2060004', credits: 6,
       course: 1, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('ced', [
         { name: 'Turno 1', sessions: [s(2,8,10), s(4,8,10), s(2,12,14), s(4,12,14)] },
@@ -126,7 +126,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'cin', name: 'Cálculo Infinitesimal y Numérico', code: '2060003', credits: 6,
+      id: 'cin', name: 'Asignatura 4', code: '2060003', credits: 6,
       course: 1, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('cin', [
         { name: 'Turno 1', sessions: [s(3,8,10), s(0,10,12)] },
@@ -135,7 +135,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'fp', name: 'Fundamentos de Programación', code: '2060001', credits: 12,
+      id: 'fp', name: 'Asignatura 5', code: '2060001', credits: 12,
       course: 1, semester: 'A', type: 'obligatoria',
       groups: buildGroups('fp', [
         { name: 'Turno 1 (C1)', sessions: [s(2,10,12), s(4,10,12)] },
@@ -149,7 +149,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 1 - C2 ============
     {
-      id: 'edc', name: 'Estructura de Computadores', code: '2060008', credits: 6,
+      id: 'edc', name: 'Asignatura 6', code: '2060008', credits: 6,
       course: 1, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('edc', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(3,10,12), s(0,12,14), s(3,12,14)] },
@@ -158,7 +158,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'est', name: 'Estadística', code: '2060007', credits: 6,
+      id: 'est', name: 'Asignatura 7', code: '2060007', credits: 6,
       course: 1, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('est', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(2,10,12)] },
@@ -167,7 +167,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'ae', name: 'Administración de Empresas', code: '2060002', credits: 6,
+      id: 'ae', name: 'Asignatura 8', code: '2060002', credits: 6,
       course: 1, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('ae', [
         { name: 'Turno 1', sessions: [s(3,8,10), s(0,10,12)] },
@@ -176,7 +176,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'aln', name: 'Álgebra Lineal y Numérica', code: '2060006', credits: 6,
+      id: 'aln', name: 'Asignatura 9', code: '2060006', credits: 6,
       course: 1, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('aln', [
         { name: 'Turno 1', sessions: [s(4,8,10), s(1,10,12)] },
@@ -187,7 +187,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 2 - C1 ============
     {
-      id: 'adda', name: 'Análisis y Diseño de Datos y Algoritmos', code: '2060010', credits: 12,
+      id: 'adda', name: 'Asignatura 10', code: '2060010', credits: 12,
       course: 2, semester: 'A', type: 'obligatoria',
       groups: buildGroups('adda', [
         { name: 'Turno 1 (C1)', sessions: [s(0,8,10), s(2,10,12)] },
@@ -199,7 +199,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'iissi1', name: 'Intro. Ingeniería del Software y SI I', code: '2060054', credits: 6,
+      id: 'iissi1', name: 'Asignatura 11', code: '2060054', credits: 6,
       course: 2, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('iissi1', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(3,10,12)] },
@@ -208,7 +208,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'rc', name: 'Redes de Computadores', code: '2060014', credits: 6,
+      id: 'rc', name: 'Asignatura 12', code: '2060014', credits: 6,
       course: 2, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('rc', [
         { name: 'Turno 1', sessions: [s(0,10,12), s(3,8,10), s(3,12,14)] },
@@ -217,7 +217,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'md', name: 'Matemática Discreta', code: '2060013', credits: 6,
+      id: 'md', name: 'Asignatura 13', code: '2060013', credits: 6,
       course: 2, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('md', [
         { name: 'Turno 1', sessions: [s(1,10,12), s(4,8,10), s(4,12,14)] },
@@ -226,7 +226,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'li', name: 'Lógica Informática', code: '2060012', credits: 6,
+      id: 'li', name: 'Asignatura 14', code: '2060012', credits: 6,
       course: 2, semester: 'C1', type: 'optativa',
       groups: buildGroups('li', [
         { name: 'Turno 1', sessions: [s(2,8,10), s(4,10,12)] },
@@ -237,7 +237,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 2 - C2 ============
     {
-      id: 'ac', name: 'Arquitectura de Computadores', code: '2060015', credits: 6,
+      id: 'ac', name: 'Asignatura 15', code: '2060015', credits: 6,
       course: 2, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('ac', [
         { name: 'Turno 1', sessions: [s(0,10,12), s(2,8,10), s(3,8,10), s(4,8,10)] },
@@ -246,7 +246,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'iissi2', name: 'Intro. Ingeniería del Software y SI II', code: '2060055', credits: 6,
+      id: 'iissi2', name: 'Asignatura 16', code: '2060055', credits: 6,
       course: 2, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('iissi2', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(3,10,12)] },
@@ -255,7 +255,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'so', name: 'Sistemas Operativos', code: '2060017', credits: 6,
+      id: 'so', name: 'Asignatura 17', code: '2060017', credits: 6,
       course: 2, semester: 'C2', type: 'obligatoria',
       groups: buildGroups('so', [
         { name: 'Turno 1', sessions: [s(1,10,12), s(4,10,12)] },
@@ -264,7 +264,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'ar', name: 'Arquitectura de Redes', code: '2060016', credits: 6,
+      id: 'ar', name: 'Asignatura 18', code: '2060016', credits: 6,
       course: 2, semester: 'C2', type: 'optativa',
       groups: buildGroups('ar', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(2,8,10), s(2,12,14), s(4,12,14)] },
@@ -275,7 +275,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 3 - C1 ============
     {
-      id: 'ia', name: 'Inteligencia Artificial', code: '2060021', credits: 6,
+      id: 'ia', name: 'Asignatura 19', code: '2060021', credits: 6,
       course: 3, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('ia', [
         { name: 'Turno 1 - Grupo 1', sessions: [s(1,10,12), s(3,12,14)] },
@@ -284,21 +284,21 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'cimsi', name: 'Config., Impl. y Mant. de SI', code: '2060018', credits: 6,
+      id: 'cimsi', name: 'Asignatura 20', code: '2060018', credits: 6,
       course: 3, semester: 'C1', type: 'optativa',
       groups: buildGroups('cimsi', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(0,10,12), s(3,10,12)] },
       ]),
     },
     {
-      id: 'gsi', name: 'Gestión de Sistemas de Información', code: '2060019', credits: 6,
+      id: 'gsi', name: 'Asignatura 21', code: '2060019', credits: 6,
       course: 3, semester: 'C1', type: 'optativa',
       groups: buildGroups('gsi', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(0,10,12), s(2,10,12), s(3,19,21)] },
       ]),
     },
     {
-      id: 'pl', name: 'Procesadores de Lenguajes', code: '2060022', credits: 6,
+      id: 'pl', name: 'Asignatura 22', code: '2060022', credits: 6,
       course: 3, semester: 'C1', type: 'optativa',
       groups: buildGroups('pl', [
         { name: 'Grupo 1', sessions: [s(2,8,10), s(2,12,14), s(3,15,17)] },
@@ -306,7 +306,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'pd', name: 'Programación Declarativa', code: '2060023', credits: 6,
+      id: 'pd', name: 'Asignatura 23', code: '2060023', credits: 6,
       course: 3, semester: 'C1', type: 'optativa',
       groups: buildGroups('pd', [
         { name: 'Grupo 1', sessions: [s(1,17,19), s(3,15,17)] },
@@ -314,14 +314,14 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'tai', name: 'Tecnologías Avanzadas de la Información', code: '2060024', credits: 6,
+      id: 'tai', name: 'Asignatura 24', code: '2060024', credits: 6,
       course: 3, semester: 'C1', type: 'optativa',
       groups: buildGroups('tai', [
         { name: 'Turno 1', sessions: [s(4,8,10), s(4,12,14), s(2,12,14), s(2,17,19), s(2,19,21)] },
       ]),
     },
     {
-      id: 'gee', name: 'Gestión y Estrategia Empresarial', code: '2060020', credits: 6,
+      id: 'gee', name: 'Asignatura 25', code: '2060020', credits: 6,
       course: 3, semester: 'C1', type: 'optativa',
       groups: buildGroups('gee', [
         { name: 'Turno 1', sessions: [s(0,17,19), s(4,15,17)] },
@@ -330,21 +330,21 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 3 - C2 ============
     {
-      id: 'asd', name: 'Arquitectura de Sistemas Distribuidos', code: '2060026', credits: 6,
+      id: 'asd', name: 'Asignatura 26', code: '2060026', credits: 6,
       course: 3, semester: 'C2', type: 'optativa',
       groups: buildGroups('asd', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(0,10,12), s(0,12,14), s(0,15,17)] },
       ]),
     },
     {
-      id: 'aia', name: 'Ampliación de Inteligencia Artificial', code: '2060025', credits: 6,
+      id: 'aia', name: 'Asignatura 27', code: '2060025', credits: 6,
       course: 3, semester: 'C2', type: 'optativa',
       groups: buildGroups('aia', [
         { name: 'Turno 1', sessions: [s(2,10,12), s(3,12,14), s(3,15,17)] },
       ]),
     },
     {
-      id: 'masi', name: 'Matemática Aplicada a SI', code: '2060027', credits: 6,
+      id: 'masi', name: 'Asignatura 28', code: '2060027', credits: 6,
       course: 3, semester: 'C2', type: 'optativa',
       groups: buildGroups('masi', [
         { name: 'Grupo 1', sessions: [s(3,8,10), s(2,12,14), s(2,15,17)] },
@@ -352,7 +352,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'sie', name: 'Sistemas de Información Empresariales', code: '2060028', credits: 6,
+      id: 'sie', name: 'Asignatura 29', code: '2060028', credits: 6,
       course: 3, semester: 'C2', type: 'optativa',
       groups: buildGroups('sie', [
         { name: 'Grupo 1', sessions: [s(1,10,12), s(3,10,12), s(3,12,14)] },
@@ -360,7 +360,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'si', name: 'Sistemas Inteligentes', code: '2060029', credits: 6,
+      id: 'si', name: 'Asignatura 30', code: '2060029', credits: 6,
       course: 3, semester: 'C2', type: 'optativa',
       groups: buildGroups('si', [
         { name: 'Grupo 1', sessions: [s(2,8,10), s(3,10,12)] },
@@ -369,7 +369,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'sos', name: 'Sistemas Orientados a Servicios', code: '2060030', credits: 6,
+      id: 'sos', name: 'Asignatura 31', code: '2060030', credits: 6,
       course: 3, semester: 'C2', type: 'optativa',
       groups: buildGroups('sos', [
         { name: 'Turno 1', sessions: [s(4,10,12), s(0,12,14), s(0,15,17)] },
@@ -378,7 +378,7 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 4 - C1 ============
     {
-      id: 'pgpi', name: 'Planificación y Gestión de Proyectos Informáticos', code: '2060040', credits: 6,
+      id: 'pgpi', name: 'Asignatura 32', code: '2060040', credits: 6,
       course: 4, semester: 'C1', type: 'obligatoria',
       groups: buildGroups('pgpi', [
         { name: 'Grupo 1', sessions: [s(3,8,10), s(1,12,14)] },
@@ -386,63 +386,63 @@ export const SUBJECTS: Record<string, Subject[]> = {
       ]),
     },
     {
-      id: 'mc', name: 'Matemáticas para la Computación', code: '2060039', credits: 6,
+      id: 'mc', name: 'Asignatura 33', code: '2060039', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('mc', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(0,10,12), s(0,12,14)] },
       ]),
     },
     {
-      id: 'ssii', name: 'Seguridad en Sistemas Informáticos e Internet', code: '2060042', credits: 6,
+      id: 'ssii', name: 'Asignatura 34', code: '2060042', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('ssii', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(4,10,12), s(2,8,10), s(2,12,14)] },
       ]),
     },
     {
-      id: 'isi', name: 'Infraestructura de Sistemas de Información', code: '2060035', credits: 6,
+      id: 'isi', name: 'Asignatura 35', code: '2060035', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('isi', [
         { name: 'Turno 1', sessions: [s(4,8,10), s(2,10,12), s(2,12,14)] },
       ]),
     },
     {
-      id: 'gps', name: 'Gestión de Procesos y Servicios', code: '2060034', credits: 6,
+      id: 'gps', name: 'Asignatura 36', code: '2060034', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('gps', [
         { name: 'Turno 1', sessions: [s(1,10,12), s(4,12,14)] },
       ]),
     },
     {
-      id: 'mati', name: 'Matemática Aplicada a TI', code: '2060038', credits: 6,
+      id: 'mati', name: 'Asignatura 37', code: '2060038', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('mati', [
         { name: 'Turno 1', sessions: [s(0,15,17), s(0,17,19), s(4,15,17)] },
       ]),
     },
     {
-      id: 'ipo', name: 'Interacción Persona-ordenador', code: '2060037', credits: 6,
+      id: 'ipo', name: 'Asignatura 38', code: '2060037', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('ipo', [
         { name: 'Turno 1', sessions: [s(0,15,17), s(0,17,19), s(2,17,19), s(0,19,21)] },
       ]),
     },
     {
-      id: 'asi', name: 'Administración de Sistemas de Información', code: '2060033', credits: 6,
+      id: 'asi', name: 'Asignatura 39', code: '2060033', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('asi', [
         { name: 'Turno 1', sessions: [s(1,15,17), s(3,15,17), s(3,17,19)] },
       ]),
     },
     {
-      id: 'pid', name: 'Procesamiento de Imágenes Digitales', code: '2060041', credits: 6,
+      id: 'pid', name: 'Asignatura 40', code: '2060041', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('pid', [
         { name: 'Turno 1', sessions: [s(2,15,17), s(4,17,19)] },
       ]),
     },
     {
-      id: 't', name: 'Telemática', code: '2060043', credits: 6,
+      id: 't', name: 'Asignatura 41', code: '2060043', credits: 6,
       course: 4, semester: 'C1', type: 'optativa',
       groups: buildGroups('t', [
         { name: 'Turno 1', sessions: [s(0,10,12), s(0,12,14), s(3,10,12)] },
@@ -451,75 +451,75 @@ export const SUBJECTS: Record<string, Subject[]> = {
 
     // ============ CURSO 4 - C2 ============
     {
-      id: 'tfg', name: 'Trabajo Fin de Grado', code: '2060053', credits: 12,
+      id: 'tfg', name: 'Asignatura 42', code: '2060053', credits: 12,
       course: 4, semester: 'C2', type: 'obligatoria',
       groups: [],
     },
     {
-      id: 'mcc', name: 'Modelos de Computación y Complejidad', code: '2060051', credits: 6,
+      id: 'mcc', name: 'Asignatura 43', code: '2060051', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('mcc', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(3,12,14)] },
       ]),
     },
     {
-      id: 'marsi', name: 'Modelado y Análisis de Requisitos en SI', code: '2060050', credits: 6,
+      id: 'marsi', name: 'Asignatura 44', code: '2060050', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('marsi', [
         { name: 'Turno 1', sessions: [s(1,8,10), s(3,10,12)] },
       ]),
     },
     {
-      id: 'gp', name: 'Gestión de la Producción', code: '2060048', credits: 6,
+      id: 'gp', name: 'Asignatura 45', code: '2060048', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('gp', [
         { name: 'Turno 1', sessions: [s(2,8,10), s(0,10,12)] },
       ]),
     },
     {
-      id: 'aii', name: 'Acceso Inteligente a la Información', code: '2060032', credits: 6,
+      id: 'aii', name: 'Asignatura 46', code: '2060032', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('aii', [
         { name: 'Turno 1', sessions: [s(4,8,10), s(0,10,12), s(3,12,14), s(4,12,14)] },
       ]),
     },
     {
-      id: 'ie', name: 'Inteligencia Empresarial', code: '2060049', credits: 6,
+      id: 'ie', name: 'Asignatura 47', code: '2060049', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('ie', [
         { name: 'Turno 1', sessions: [s(1,10,12), s(1,12,14)] },
       ]),
     },
     {
-      id: 'asc', name: 'Aplicaciones de Soft Computing', code: '2060044', credits: 6,
+      id: 'asc', name: 'Asignatura 48', code: '2060044', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('asc', [
         { name: 'Turno 1', sessions: [s(0,8,10), s(0,12,14)] },
       ]),
     },
     {
-      id: 'crip', name: 'Criptografía', code: '2060046', credits: 6,
+      id: 'crip', name: 'Asignatura 49', code: '2060046', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('crip', [
         { name: 'Turno 1', sessions: [s(2,12,14), s(4,10,12)] },
       ]),
     },
     {
-      id: 'cm', name: 'Computación Móvil', code: '2060045', credits: 6,
+      id: 'cm', name: 'Asignatura 50', code: '2060045', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('cm', [
         { name: 'Turno 1', sessions: [s(0,15,17), s(2,15,17), s(2,19,21)] },
       ]),
     },
     {
-      id: 'tis', name: 'Tecnología, Informática y Sociedad', code: '2060052', credits: 6,
+      id: 'tis', name: 'Asignatura 51', code: '2060052', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('tis', [
         { name: 'Turno 1', sessions: [s(1,15,17), s(3,15,17), s(3,17,19)] },
       ]),
     },
     {
-      id: 'ecomp', name: 'Estadística Computacional', code: '2060047', credits: 6,
+      id: 'ecomp', name: 'Asignatura 52', code: '2060047', credits: 6,
       course: 4, semester: 'C2', type: 'optativa',
       groups: buildGroups('ecomp', [
         { name: 'Turno 1', sessions: [s(0,17,19), s(2,17,19)] },
