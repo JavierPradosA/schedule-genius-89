@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DAYS, TIME_BLOCKS, TimeBlock, Subject } from '@/data/demoData';
-import { ArrowLeft, ArrowRight, Ban, ChevronDown, ChevronUp, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Ban, User } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export type ProfessorPreferences = Record<string, string | undefined>; // subjectId -> preferred professor name
