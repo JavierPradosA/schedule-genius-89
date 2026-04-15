@@ -45,13 +45,13 @@ export const TIME_BLOCKS = [
 export const HOURS = TIME_BLOCKS.map(b => b.start);
 
 export const DEGREES = [
-  { id: 'giti', name: 'Grado en Ingeniería Informática – Tecnologías Informáticas' },
+  { id: 'giti', name: 'Grado Universitario' },
 ];
 
 export const MENTIONS = [
-  { id: 'si', name: 'Sistemas de Información' },
-  { id: 'ti', name: 'Tecnología de la Información' },
-  { id: 'comp', name: 'Computación' },
+  { id: 'si', name: 'Mención A' },
+  { id: 'ti', name: 'Mención B' },
+  { id: 'comp', name: 'Mención C' },
 ];
 
 const COLORS = [
