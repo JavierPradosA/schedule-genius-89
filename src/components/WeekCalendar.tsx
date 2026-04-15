@@ -122,8 +122,8 @@ const WeekCalendar = ({ sessions, blockedTimes = [], compact = false }: WeekCale
                           <TooltipTrigger asChild>
                             <div
                               className={`absolute rounded-md px-1 py-0.5 text-xs overflow-hidden transition-transform hover:scale-[1.03] hover:z-20 cursor-default
-                                ${isOverlap ? 'border border-dashed border-destructive/40' : ''}
-                                ${onBlockedTime ? 'border border-dashed border-destructive/40' : ''}`}
+                                ${isOverlap ? 'border-2 border-solid border-destructive' : ''}
+                                ${!isOverlap && onBlockedTime ? 'border border-dashed border-destructive/40' : ''}`}
                               style={{
                                 top,
                                 height,
