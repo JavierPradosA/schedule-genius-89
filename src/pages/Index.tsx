@@ -31,16 +31,23 @@ const Index = () => {
             <div className="flex items-center justify-between mb-2">
               {STEP_LABELS.map((label, i) => (
                 <div key={label} className="flex items-center">
-                  <div
+                  <button
+                    onClick={() => i <= step && setStep(i)}
+                    disabled={i > step}
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
                       i <= step
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
+                        ? 'bg-primary text-primary-foreground cursor-pointer hover:opacity-80'
+                        : 'bg-muted text-muted-foreground cursor-not-allowed'
                     }`}
                   >
                     {i + 1}
-                  </div>
-                  <span className="ml-1.5 text-xs font-medium hidden sm:inline text-foreground/70">
+                  </button>
+                  <span
+                    onClick={() => i <= step && setStep(i)}
+                    className={`ml-1.5 text-xs font-medium hidden sm:inline ${
+                      i <= step ? 'text-foreground/70 cursor-pointer hover:text-foreground' : 'text-foreground/40 cursor-not-allowed'
+                    }`}
+                  >
                     {label}
                   </span>
                   {i < STEP_LABELS.length - 1 && (
