@@ -138,46 +138,44 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
         </div>
       </div>
 
-      {/* Professor preferences */}
-      {subjectsWithProfessors.length > 0 && (
-        <div className="mb-8">
-          <button
-            onClick={() => setShowProfessors(!showProfessors)}
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-3"
-          >
-            <User className="w-4 h-4" />
-            Preferencia de profesores
-            {showProfessors ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            <span className="text-xs text-muted-foreground/60 font-normal">(opcional)</span>
-          </button>
+      {/* Professor preferences - always visible */}
+      <div className="mb-8">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-foreground mb-4">
+          <User className="w-4 h-4" />
+          Preferencia de profesores
+          <span className="text-xs text-muted-foreground font-normal">(opcional — prioriza el grupo de ese profesor)</span>
+        </h3>
 
-          {showProfessors && (
-            <div className="space-y-3 pl-6 border-l-2 border-border">
-              {subjectsWithProfessors.map(sub => (
-                <div key={sub.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                  <span className="text-sm text-foreground/80 min-w-[180px] truncate">{sub.name}</span>
-                  <Select
-                    value={professorPrefs[sub.id] || '_any'}
-                    onValueChange={val =>
-                      setProfessorPrefs({ ...professorPrefs, [sub.id]: val === '_any' ? undefined : val })
-                    }
-                  >
-                    <SelectTrigger className="h-8 text-xs w-full sm:w-[220px]">
-                      <SelectValue placeholder="Sin preferencia" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="_any">Sin preferencia</SelectItem>
-                      {sub.professors.map(prof => (
-                        <SelectItem key={prof} value={prof}>{prof}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+        {subjectsWithProfessors.length > 0 ? (
+          <div className="space-y-3 pl-4 border-l-2 border-primary/30">
+            {subjectsWithProfessors.map(sub => (
+              <div key={sub.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                <span className="text-sm text-foreground/80 min-w-[180px] truncate">{sub.name}</span>
+                <Select
+                  value={professorPrefs[sub.id] || '_any'}
+                  onValueChange={val =>
+                    setProfessorPrefs({ ...professorPrefs, [sub.id]: val === '_any' ? undefined : val })
+                  }
+                >
+                  <SelectTrigger className="h-8 text-xs w-full sm:w-[220px]">
+                    <SelectValue placeholder="Sin preferencia" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_any">Sin preferencia</SelectItem>
+                    {sub.professors.map(prof => (
+                      <SelectItem key={prof} value={prof}>{prof}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">
+            Las asignaturas seleccionadas solo tienen un profesor disponible por grupo.
+          </p>
+        )}
+      </div>
 
       {/* Navigation */}
       <div className="flex justify-between">
