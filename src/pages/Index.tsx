@@ -21,6 +21,14 @@ const Index = () => {
 
   const next = () => setStep(s => Math.min(s + 1, 4));
   const prev = () => setStep(s => Math.max(s - 1, 0));
+  const restart = () => {
+    setStep(0);
+    setDegree('');
+    setSelectedSubjects([]);
+    setBlockedTimes([]);
+    setProfessorPrefs({});
+    setChosenSchedule(null);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,8 +40,11 @@ const Index = () => {
               {STEP_LABELS.map((label, i) => (
                 <div key={label} className="flex items-center">
                   <button
+                    type="button"
                     onClick={() => i <= step && setStep(i)}
                     disabled={i > step}
+                    aria-label={`Ir a ${label}`}
+                    aria-current={i === step ? 'step' : undefined}
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
                       i <= step
                         ? 'bg-primary text-primary-foreground cursor-pointer hover:opacity-80'
@@ -104,7 +115,7 @@ const Index = () => {
             />
           )}
           {step === 4 && chosenSchedule && (
-            <StepSummary schedule={chosenSchedule} onBack={prev} onRestart={() => setStep(0)} />
+            <StepSummary schedule={chosenSchedule} blockedTimes={blockedTimes} onBack={prev} onRestart={restart} />
           )}
         </motion.div>
       </AnimatePresence>

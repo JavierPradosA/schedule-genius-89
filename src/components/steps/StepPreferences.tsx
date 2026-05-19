@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DAYS, TIME_BLOCKS, TimeBlock, Subject } from '@/data/demoData';
 import { ArrowLeft, ArrowRight, Ban, User } from 'lucide-react';
@@ -17,8 +16,6 @@ interface StepPreferencesProps {
 }
 
 const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, professorPrefs, setProfessorPrefs, onNext, onBack }: StepPreferencesProps) => {
-  const [showProfessors, setShowProfessors] = useState(true);
-
   const isBlocked = (day: number, startHour: number) =>
     blockedTimes.some(b => b.day === day && b.startHour === startHour);
 
@@ -61,7 +58,9 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
   // Extract unique professors per subject
   const subjectsWithProfessors = selectedSubjects
     .map(sub => {
-      const professors = [...new Set(sub.groups.map(g => g.professor))];
+      const professors = [...new Set(
+        sub.groups.flatMap(g => g.professors?.length ? g.professors : [g.professor])
+      )].sort((a, b) => a.localeCompare(b, 'es'));
       return { id: sub.id, name: sub.name, professors };
     })
     .filter(s => s.professors.length > 1); // only show if there's a choice
@@ -109,8 +108,11 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
                 const blocked = isBlocked(day, block.start);
                 return (
                   <button
+                    type="button"
                     key={day}
                     onClick={() => toggleBlock(day, block)}
+                    aria-pressed={blocked}
+                    aria-label={`${blocked ? 'Desbloquear' : 'Bloquear'} ${DAYS[day]}, ${block.label}`}
                     className={`h-12 border-l border-border/30 transition-colors ${
                       blocked
                         ? 'bg-destructive/20 hover:bg-destructive/30'

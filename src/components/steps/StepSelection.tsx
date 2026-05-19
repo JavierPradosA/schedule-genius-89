@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SUBJECTS, Subject } from '@/data/demoData';
 import { ArrowLeft, ArrowRight, BookOpen, FlaskConical, GraduationCap } from 'lucide-react';
@@ -31,13 +31,15 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
   const [semester, setSemester] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
 
-  // Auto-select the only degree
-  if (!degree) {
-    setDegree('giti');
-  }
+  useEffect(() => {
+    if (!degree) {
+      setDegree('giti');
+    }
+  }, [degree, setDegree]);
 
-  const subjects = SUBJECTS['giti'] || [];
-  const courses = [...new Set(subjects.map(s => s.course))].sort();
+  const activeDegree = degree || 'giti';
+  const subjects = useMemo(() => SUBJECTS[activeDegree] || [], [activeDegree]);
+  const courses = useMemo(() => [...new Set(subjects.map(s => s.course))].sort(), [subjects]);
 
   const filteredSubjects = subjects.filter(s => {
     if (course && s.course !== course) return false;
@@ -76,7 +78,9 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
         <label className="text-sm font-semibold text-foreground mb-2 block">Curso</label>
         <div className="flex flex-wrap gap-2">
           <button
+            type="button"
             onClick={() => setCourse(null)}
+            aria-pressed={course === null}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               course === null ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
@@ -85,8 +89,10 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
           </button>
           {courses.map(c => (
             <button
+              type="button"
               key={c}
               onClick={() => setCourse(c)}
+              aria-pressed={course === c}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 course === c ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
@@ -103,8 +109,10 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
         <div className="flex flex-wrap gap-2">
           {SEMESTER_OPTIONS.map(opt => (
             <button
+              type="button"
               key={opt.label}
               onClick={() => setSemester(opt.value)}
+              aria-pressed={semester === opt.value}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 semester === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
@@ -121,8 +129,10 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
         <div className="flex flex-wrap gap-2">
           {TYPE_OPTIONS.map(opt => (
             <button
+              type="button"
               key={opt.label}
               onClick={() => setTypeFilter(opt.value)}
+              aria-pressed={typeFilter === opt.value}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 typeFilter === opt.value ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
@@ -152,9 +162,12 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
             const noGroups = subject.groups.length === 0;
             return (
               <button
+                type="button"
                 key={subject.id}
                 onClick={() => !noGroups && toggleSubject(subject)}
                 disabled={noGroups}
+                aria-pressed={selected}
+                aria-label={`${selected ? 'Quitar' : 'Seleccionar'} ${subject.name}`}
                 className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all text-left ${
                   noGroups
                     ? 'border-border opacity-50 cursor-not-allowed'

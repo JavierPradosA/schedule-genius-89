@@ -2,17 +2,22 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScheduleOption } from '@/lib/scheduleGenerator';
 import WeekCalendar from '@/components/WeekCalendar';
-import { Download, RotateCcw, Star } from 'lucide-react';
+import { TimeBlock } from '@/data/demoData';
+import { getAnonymousSessionId, saveFeedback } from '@/lib/feedback';
+import { AlertTriangle, Ban, CheckCircle2, Download, RotateCcw, Star } from 'lucide-react';
 
 interface StepSummaryProps {
   schedule: ScheduleOption;
+  blockedTimes?: TimeBlock[];
   onBack: () => void;
   onRestart: () => void;
 }
 
-const StepSummary = ({ schedule, onBack, onRestart }: StepSummaryProps) => {
+const StepSummary = ({ schedule, blockedTimes = [], onBack, onRestart }: StepSummaryProps) => {
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleDownload = () => {
     // Create a text summary for download
@@ -54,6 +59,29 @@ const StepSummary = ({ schedule, onBack, onRestart }: StepSummaryProps) => {
     { id: 'recommend', label: '¿Lo recomendarías?' },
   ];
 
+  const handleSubmitFeedback = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      await saveFeedback({
+        idSesion: getAnonymousSessionId(),
+        facilidadUso: ratings.ease,
+        utilidadPercibida: ratings.useful,
+        recomendacion: ratings.recommend,
+      });
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo guardar la valoración. Inténtalo de nuevo.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       <div className="text-center mb-8">
@@ -68,9 +96,45 @@ const StepSummary = ({ schedule, onBack, onRestart }: StepSummaryProps) => {
         </p>
       </div>
 
+      <div className="mb-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700">
+            <CheckCircle2 className="h-4 w-4" />
+            Clases
+          </div>
+          <p className="mt-1 text-2xl font-bold text-foreground">{schedule.sessions.length}</p>
+        </div>
+        <div className={`rounded-lg border p-3 ${
+          schedule.blockedViolations > 0
+            ? 'border-destructive/40 bg-destructive/10'
+            : 'border-border bg-muted/40'
+        }`}>
+          <div className={`flex items-center gap-2 text-sm font-semibold ${
+            schedule.blockedViolations > 0 ? 'text-destructive' : 'text-muted-foreground'
+          }`}>
+            <Ban className="h-4 w-4" />
+            En franjas bloqueadas
+          </div>
+          <p className="mt-1 text-2xl font-bold text-foreground">{schedule.blockedViolations}</p>
+        </div>
+        <div className={`rounded-lg border p-3 ${
+          schedule.conflicts > 0
+            ? 'border-destructive/40 bg-destructive/10'
+            : 'border-border bg-muted/40'
+        }`}>
+          <div className={`flex items-center gap-2 text-sm font-semibold ${
+            schedule.conflicts > 0 ? 'text-destructive' : 'text-muted-foreground'
+          }`}>
+            <AlertTriangle className="h-4 w-4" />
+            Solapamientos
+          </div>
+          <p className="mt-1 text-2xl font-bold text-foreground">{schedule.conflicts}</p>
+        </div>
+      </div>
+
       {/* Calendar */}
       <div className="mb-8">
-        <WeekCalendar sessions={schedule.sessions} />
+        <WeekCalendar sessions={schedule.sessions} blockedTimes={blockedTimes} />
       </div>
 
       {/* Subject summary */}
@@ -118,8 +182,11 @@ const StepSummary = ({ schedule, onBack, onRestart }: StepSummaryProps) => {
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map(n => (
                       <button
+                        type="button"
                         key={n}
                         onClick={() => setRatings({ ...ratings, [q.id]: n })}
+                        aria-label={`${q.label} ${n} de 5`}
+                        aria-pressed={(ratings[q.id] || 0) >= n}
                         className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${
                           (ratings[q.id] || 0) >= n
                             ? 'border-secondary bg-secondary/20 text-secondary'
@@ -134,12 +201,17 @@ const StepSummary = ({ schedule, onBack, onRestart }: StepSummaryProps) => {
               ))}
             </div>
             <Button
-              onClick={() => setSubmitted(true)}
-              disabled={Object.keys(ratings).length < surveyQuestions.length}
+              onClick={handleSubmitFeedback}
+              disabled={Object.keys(ratings).length < surveyQuestions.length || isSubmitting}
               className="bg-primary text-primary-foreground"
             >
-              Enviar valoración
+              {isSubmitting ? 'Enviando...' : 'Enviar valoración'}
             </Button>
+            {submitError && (
+              <p className="mt-3 text-sm text-destructive">
+                No se ha podido guardar la valoración: {submitError}
+              </p>
+            )}
           </>
         ) : (
           <div className="text-center py-4">

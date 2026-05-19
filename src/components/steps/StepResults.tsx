@@ -93,8 +93,10 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {semesterResults.map((result) => (
               <button
+                type="button"
                 key={result.semester}
                 onClick={() => setActiveSemester(result.semester)}
+                aria-pressed={activeSemester === result.semester}
                 className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
                   activeSemester === result.semester
                     ? 'border-secondary bg-secondary/10 text-foreground'
@@ -144,8 +146,10 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
           <div className="flex flex-wrap gap-3">
             {semesterResults.map((result) => (
               <button
+                type="button"
                 key={result.semester}
                 onClick={() => setActiveSemester(result.semester)}
+                aria-pressed={activeSemester === result.semester}
                 className={`px-4 py-3 rounded-lg border-2 text-left transition-all ${
                   activeSemester === result.semester
                     ? 'border-secondary bg-secondary/10 shadow-card'
@@ -178,8 +182,10 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
       <div className="flex flex-wrap gap-3 mb-6">
         {activeResult.options.map((opt, i) => (
           <button
+            type="button"
             key={opt.id}
             onClick={() => setSelectedIdxBySemester((prev) => ({ ...prev, [activeResult.semester]: i }))}
+            aria-pressed={currentIndex === i}
             className={`px-4 py-3 rounded-lg border-2 text-left transition-all ${
               currentIndex === i
                 ? 'border-secondary bg-secondary/10 shadow-card'
@@ -215,7 +221,7 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
         <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
           <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
           <p className="text-sm text-foreground">
-            Este horario tiene <strong>{current.blockedViolations} clase(s) en franjas que bloqueaste</strong> porque no existe ningún turno que las evite. Se marcan con ⚠ en el calendario.
+            Este horario tiene <strong>{current.blockedViolations} clase(s) en franjas que bloqueaste</strong> porque no existe ningún turno que las evite. Se marcan con borde rojo en el calendario.
           </p>
         </div>
       )}
