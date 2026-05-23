@@ -41,6 +41,7 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
   const [loadingSubjects, setLoadingSubjects] = useState(false);
 
   useEffect(() => {
+<<<<<<< HEAD
     let ignore = false;
 
     async function loadDegrees() {
@@ -99,6 +100,16 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
   const filteredDegrees = degrees.filter((d) =>
     d.name.toLocaleLowerCase('es').includes(degreeSearch.toLocaleLowerCase('es'))
   );
+=======
+    if (!degree) {
+      setDegree('giti');
+    }
+  }, [degree, setDegree]);
+
+  const activeDegree = degree || 'giti';
+  const subjects = useMemo(() => SUBJECTS[activeDegree] || [], [activeDegree]);
+  const courses = useMemo(() => [...new Set(subjects.map(s => s.course))].sort(), [subjects]);
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
 
   const filteredSubjects = subjects.filter(s => {
     if (course && s.course !== course) return false;
@@ -308,7 +319,12 @@ const StepSelection = ({ degree, setDegree, selectedSubjects, setSelectedSubject
               <button
                 type="button"
                 key={subject.id}
+<<<<<<< HEAD
                 onClick={() => toggleSubject(subject)}
+=======
+                onClick={() => !noGroups && toggleSubject(subject)}
+                disabled={noGroups}
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
                 aria-pressed={selected}
                 aria-label={`${selected ? 'Quitar' : 'Seleccionar'} ${subject.name}`}
                 className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all text-left ${

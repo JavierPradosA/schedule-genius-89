@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "setup:supabase": "node scripts/setupSupabaseFeedback.mjs",
+<<<<<<< HEAD
     "seed:etsii": "node scripts/seedEtsiiAcademicFromLocal.mjs",
+=======
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
     "test": "vitest run",
     "test:watch": "vitest"
   },

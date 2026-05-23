@@ -3,24 +3,38 @@ import { Button } from '@/components/ui/button';
 import WeekCalendar from '@/components/WeekCalendar';
 import { TimeBlock } from '@/data/demoData';
 import { getAnonymousSessionId, saveFeedback } from '@/lib/feedback';
+<<<<<<< HEAD
 import { ChosenSemesterSchedule } from '@/lib/semesterSchedules';
 import { AlertTriangle, Ban, CheckCircle2, Download, RotateCcw, Star } from 'lucide-react';
 
 interface StepSummaryProps {
   schedules: ChosenSemesterSchedule[];
+=======
+import { AlertTriangle, Ban, CheckCircle2, Download, RotateCcw, Star } from 'lucide-react';
+
+interface StepSummaryProps {
+  schedule: ScheduleOption;
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
   blockedTimes?: TimeBlock[];
   onBack: () => void;
   onRestart: () => void;
 }
 
+<<<<<<< HEAD
 const StepSummary = ({ schedules, blockedTimes = [], onBack, onRestart }: StepSummaryProps) => {
+=======
+const StepSummary = ({ schedule, blockedTimes = [], onBack, onRestart }: StepSummaryProps) => {
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+<<<<<<< HEAD
   const totalSessions = schedules.reduce((sum, item) => sum + item.schedule.sessions.length, 0);
   const totalBlockedViolations = schedules.reduce((sum, item) => sum + item.schedule.blockedViolations, 0);
   const totalConflicts = schedules.reduce((sum, item) => sum + item.schedule.conflicts, 0);
+=======
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
 
   const handleDownload = () => {
     // Create a text summary for download
@@ -119,32 +133,55 @@ const StepSummary = ({ schedules, blockedTimes = [], onBack, onRestart }: StepSu
             <CheckCircle2 className="h-4 w-4" />
             Clases
           </div>
+<<<<<<< HEAD
           <p className="mt-1 text-2xl font-bold text-foreground">{totalSessions}</p>
         </div>
         <div className={`rounded-lg border p-3 ${
           totalBlockedViolations > 0
+=======
+          <p className="mt-1 text-2xl font-bold text-foreground">{schedule.sessions.length}</p>
+        </div>
+        <div className={`rounded-lg border p-3 ${
+          schedule.blockedViolations > 0
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
             ? 'border-destructive/40 bg-destructive/10'
             : 'border-border bg-muted/40'
         }`}>
           <div className={`flex items-center gap-2 text-sm font-semibold ${
+<<<<<<< HEAD
             totalBlockedViolations > 0 ? 'text-destructive' : 'text-muted-foreground'
+=======
+            schedule.blockedViolations > 0 ? 'text-destructive' : 'text-muted-foreground'
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
           }`}>
             <Ban className="h-4 w-4" />
             En franjas bloqueadas
           </div>
+<<<<<<< HEAD
           <p className="mt-1 text-2xl font-bold text-foreground">{totalBlockedViolations}</p>
         </div>
         <div className={`rounded-lg border p-3 ${
           totalConflicts > 0
+=======
+          <p className="mt-1 text-2xl font-bold text-foreground">{schedule.blockedViolations}</p>
+        </div>
+        <div className={`rounded-lg border p-3 ${
+          schedule.conflicts > 0
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
             ? 'border-destructive/40 bg-destructive/10'
             : 'border-border bg-muted/40'
         }`}>
           <div className={`flex items-center gap-2 text-sm font-semibold ${
+<<<<<<< HEAD
             totalConflicts > 0 ? 'text-destructive' : 'text-muted-foreground'
+=======
+            schedule.conflicts > 0 ? 'text-destructive' : 'text-muted-foreground'
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
           }`}>
             <AlertTriangle className="h-4 w-4" />
             Solapamientos
           </div>
+<<<<<<< HEAD
           <p className="mt-1 text-2xl font-bold text-foreground">{totalConflicts}</p>
         </div>
       </div>
@@ -161,6 +198,15 @@ const StepSummary = ({ schedules, blockedTimes = [], onBack, onRestart }: StepSu
             <WeekCalendar sessions={item.schedule.sessions} blockedTimes={blockedTimes} />
           </section>
         ))}
+=======
+          <p className="mt-1 text-2xl font-bold text-foreground">{schedule.conflicts}</p>
+        </div>
+      </div>
+
+      {/* Calendar */}
+      <div className="mb-8">
+        <WeekCalendar sessions={schedule.sessions} blockedTimes={blockedTimes} />
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
       </div>
 
       {/* Subject summary */}

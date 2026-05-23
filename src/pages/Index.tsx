@@ -27,7 +27,11 @@ const Index = () => {
     setSelectedSubjects([]);
     setBlockedTimes([]);
     setProfessorPrefs({});
+<<<<<<< HEAD
     setChosenSchedules([]);
+=======
+    setChosenSchedule(null);
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
   };
 
   return (
@@ -114,8 +118,13 @@ const Index = () => {
               onBack={prev}
             />
           )}
+<<<<<<< HEAD
           {step === 4 && chosenSchedules.length > 0 && (
             <StepSummary schedules={chosenSchedules} blockedTimes={blockedTimes} onBack={prev} onRestart={restart} />
+=======
+          {step === 4 && chosenSchedule && (
+            <StepSummary schedule={chosenSchedule} blockedTimes={blockedTimes} onBack={prev} onRestart={restart} />
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
           )}
         </motion.div>
       </AnimatePresence>

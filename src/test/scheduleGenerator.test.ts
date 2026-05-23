@@ -17,6 +17,7 @@ const makeSubject = (
 });
 
 describe("generateSchedules", () => {
+<<<<<<< HEAD
   it("keeps subjects without groups as selection-only options", () => {
     const result = generateSchedules([makeSubject("empty", [])], []);
 
@@ -33,6 +34,12 @@ describe("generateSchedules", () => {
         ],
       }),
     );
+=======
+  it("warns and skips subjects without groups", () => {
+    const result = generateSchedules([makeSubject("empty", [])], []);
+
+    expect(result.options).toEqual([]);
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
     expect(result.warnings).toEqual([
       expect.objectContaining({
         type: "no_groups",

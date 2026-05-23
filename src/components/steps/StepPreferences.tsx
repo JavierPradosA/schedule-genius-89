@@ -56,12 +56,18 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
 
   const clearAll = () => setBlockedTimes([]);
 
+<<<<<<< HEAD
   const subjectsBySemester = (['C1', 'C2'] as SemesterKey[]).map((semester) => ({
     semester,
     label: SEMESTER_LABELS[semester],
     subjects: selectedSubjects
       .filter((subject) => subject.semester === semester || subject.semester === 'A')
       .map(sub => {
+=======
+  // Extract unique professors per subject
+  const subjectsWithProfessors = selectedSubjects
+    .map(sub => {
+>>>>>>> 79fd0255223fc5fd76f0cc4655bea2873e8a72bb
       const professors = [...new Set(
         sub.groups.flatMap(g => g.professors?.length ? g.professors : [g.professor])
       )].sort((a, b) => a.localeCompare(b, 'es'));
