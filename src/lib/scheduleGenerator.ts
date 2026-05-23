@@ -10,6 +10,7 @@ export interface ScheduleOption {
   gaps: number;
   selections: { subjectId: string; groupId: string }[];
   sessions: ScheduleSession[];
+  subjects: ScheduleSubjectSummary[];
 }
 
 export interface ScheduleSession {
@@ -24,12 +25,21 @@ export interface ScheduleSession {
   colorIndex: number;
 }
 
+export interface ScheduleSubjectSummary {
+  subjectId: string;
+  subjectName: string;
+  groupName: string;
+  professor: string;
+}
+
 export interface ScheduleWarning {
-  type: 'no_groups' | 'all_blocked' | 'unavoidable_conflict';
+  type: 'no_groups' | 'all_blocked' | 'unavoidable_conflict' | 'generation_limited';
   subjectId: string;
   subjectName: string;
   message: string;
 }
+
+const MAX_COMBINATIONS = 10000;
 
 function hasOverlap(a: Session, b: Session): boolean {
   if (a.day !== b.day) return false;
@@ -95,11 +105,34 @@ export function generateSchedules(
 ): { options: ScheduleOption[]; warnings: ScheduleWarning[] } {
   const warnings = checkWarnings(subjects, blockedTimes);
 
-  // Filter out subjects with no groups
   const validSubjects = subjects.filter(s => s.groups.length > 0);
+  const unscheduledSubjects = subjects.filter(s => s.groups.length === 0);
 
   if (validSubjects.length === 0) {
-    return { options: [], warnings };
+    if (subjects.length === 0) {
+      return { options: [], warnings };
+    }
+
+    return {
+      options: [{
+        id: 'selection-only',
+        label: 'Selección de asignaturas',
+        description: 'Asignaturas cargadas desde el plan oficial, sin horario público estructurado.',
+        score: 0,
+        conflicts: 0,
+        blockedViolations: 0,
+        gaps: 0,
+        selections: subjects.map((subject) => ({ subjectId: subject.id, groupId: 'pending-schedule' })),
+        sessions: [],
+        subjects: subjects.map((subject) => ({
+          subjectId: subject.id,
+          subjectName: subject.name,
+          groupName: 'Horario pendiente',
+          professor: 'Profesorado pendiente',
+        })),
+      }],
+      warnings,
+    };
   }
 
   // For each subject, get valid groups (not blocked), fallback to all
@@ -107,14 +140,32 @@ export function generateSchedules(
     const valid = subject.groups.filter(g =>
       !g.sessions.some(session => isBlockedTime(session, blockedTimes))
     );
-    return valid.length > 0 ? valid : subject.groups;
+    const candidates = valid.length > 0 ? valid : subject.groups;
+
+    return [...candidates].sort((a, b) => {
+      const pref = professorPrefs?.[subject.id];
+      const scoreGroup = (group: SubjectGroup) => {
+        const blockedPenalty = group.sessions.filter(session => isBlockedTime(session, blockedTimes)).length * 100;
+        const groupProfessors = group.professors?.length ? group.professors : [group.professor];
+        const preferencePenalty = pref && !groupProfessors.includes(pref) ? 10 : 0;
+        const afternoonPenalty = group.sessions.some(session => session.startHour >= 15) ? 1 : 0;
+        return blockedPenalty + preferencePenalty + afternoonPenalty;
+      };
+
+      return scoreGroup(a) - scoreGroup(b);
+    });
   });
 
-  // Generate combinations via backtracking (limit to avoid explosion)
+  // Generate combinations via backtracking. The cap prevents runaway work for very large selections.
   const combinations: SubjectGroup[][] = [];
+  const estimatedCombinations = groupsPerSubject.reduce((total, groups) => total * groups.length, 1);
+  let reachedLimit = false;
 
   function backtrack(idx: number, current: SubjectGroup[]) {
-    if (combinations.length >= 100) return;
+    if (combinations.length >= MAX_COMBINATIONS) {
+      reachedLimit = true;
+      return;
+    }
     if (idx === validSubjects.length) {
       combinations.push([...current]);
       return;
@@ -127,6 +178,15 @@ export function generateSchedules(
   }
 
   backtrack(0, []);
+
+  if (reachedLimit || estimatedCombinations > MAX_COMBINATIONS) {
+    warnings.push({
+      type: 'generation_limited',
+      subjectId: 'schedule-generation',
+      subjectName: 'Generación de horarios',
+      message: `La selección tiene ${estimatedCombinations.toLocaleString('es-ES')} combinaciones posibles. Se han evaluado las ${MAX_COMBINATIONS.toLocaleString('es-ES')} candidatas más prometedoras según restricciones y preferencias.`,
+    });
+  }
 
   if (combinations.length === 0) {
     return { options: [], warnings };
@@ -167,6 +227,20 @@ export function generateSchedules(
         colorIndex: gi,
       }))
     );
+    const subjectSummaries: ScheduleSubjectSummary[] = [
+      ...combo.map((group, gi) => ({
+        subjectId: validSubjects[gi].id,
+        subjectName: validSubjects[gi].name,
+        groupName: group.name,
+        professor: group.professor,
+      })),
+      ...unscheduledSubjects.map((subject) => ({
+        subjectId: subject.id,
+        subjectName: subject.name,
+        groupName: 'Horario pendiente',
+        professor: 'Profesorado pendiente',
+      })),
+    ];
 
     const gaps = countGaps(scheduleSessions);
     const afternoons = hasAfternoons(scheduleSessions);
@@ -176,7 +250,8 @@ export function generateSchedules(
     if (professorPrefs) {
       for (let gi = 0; gi < combo.length; gi++) {
         const pref = professorPrefs[validSubjects[gi].id];
-        if (pref && combo[gi].professor !== pref) {
+        const groupProfessors = combo[gi].professors?.length ? combo[gi].professors : [combo[gi].professor];
+        if (pref && !groupProfessors.includes(pref)) {
           profMismatches++;
         }
       }
@@ -193,6 +268,7 @@ export function generateSchedules(
       afternoons,
       selections: combo.map((g, gi) => ({ subjectId: validSubjects[gi].id, groupId: g.id })),
       sessions: scheduleSessions,
+      subjects: subjectSummaries,
     };
   });
 

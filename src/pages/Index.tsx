@@ -7,7 +7,7 @@ import { ProfessorPreferences } from '@/components/steps/StepPreferences';
 import StepResults from '@/components/steps/StepResults';
 import StepSummary from '@/components/steps/StepSummary';
 import { Subject, TimeBlock } from '@/data/demoData';
-import { ScheduleOption } from '@/lib/scheduleGenerator';
+import { ChosenSemesterSchedule } from '@/lib/semesterSchedules';
 
 const STEP_LABELS = ['Inicio', 'Asignaturas', 'Preferencias', 'Resultados', 'Resumen'];
 
@@ -17,10 +17,18 @@ const Index = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
   const [blockedTimes, setBlockedTimes] = useState<TimeBlock[]>([]);
   const [professorPrefs, setProfessorPrefs] = useState<ProfessorPreferences>({});
-  const [chosenSchedule, setChosenSchedule] = useState<ScheduleOption | null>(null);
+  const [chosenSchedules, setChosenSchedules] = useState<ChosenSemesterSchedule[]>([]);
 
   const next = () => setStep(s => Math.min(s + 1, 4));
   const prev = () => setStep(s => Math.max(s - 1, 0));
+  const restart = () => {
+    setStep(0);
+    setDegree('');
+    setSelectedSubjects([]);
+    setBlockedTimes([]);
+    setProfessorPrefs({});
+    setChosenSchedules([]);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -32,8 +40,11 @@ const Index = () => {
               {STEP_LABELS.map((label, i) => (
                 <div key={label} className="flex items-center">
                   <button
+                    type="button"
                     onClick={() => i <= step && setStep(i)}
                     disabled={i > step}
+                    aria-label={`Ir a ${label}`}
+                    aria-current={i === step ? 'step' : undefined}
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
                       i <= step
                         ? 'bg-primary text-primary-foreground cursor-pointer hover:opacity-80'
@@ -96,15 +107,15 @@ const Index = () => {
               subjects={selectedSubjects}
               blockedTimes={blockedTimes}
               professorPrefs={professorPrefs}
-              onChoose={(schedule) => {
-                setChosenSchedule(schedule);
+              onChoose={(schedules) => {
+                setChosenSchedules(schedules);
                 next();
               }}
               onBack={prev}
             />
           )}
-          {step === 4 && chosenSchedule && (
-            <StepSummary schedule={chosenSchedule} onBack={prev} onRestart={() => setStep(0)} />
+          {step === 4 && chosenSchedules.length > 0 && (
+            <StepSummary schedules={chosenSchedules} blockedTimes={blockedTimes} onBack={prev} onRestart={restart} />
           )}
         </motion.div>
       </AnimatePresence>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DAYS, TIME_BLOCKS, TimeBlock, Subject } from '@/data/demoData';
+import { SEMESTER_LABELS, SemesterKey } from '@/lib/semesterSchedules';
 import { ArrowLeft, ArrowRight, Ban, User } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -17,8 +17,6 @@ interface StepPreferencesProps {
 }
 
 const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, professorPrefs, setProfessorPrefs, onNext, onBack }: StepPreferencesProps) => {
-  const [showProfessors, setShowProfessors] = useState(true);
-
   const isBlocked = (day: number, startHour: number) =>
     blockedTimes.some(b => b.day === day && b.startHour === startHour);
 
@@ -58,13 +56,18 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
 
   const clearAll = () => setBlockedTimes([]);
 
-  // Extract unique professors per subject
-  const subjectsWithProfessors = selectedSubjects
-    .map(sub => {
-      const professors = [...new Set(sub.groups.map(g => g.professor))];
+  const subjectsBySemester = (['C1', 'C2'] as SemesterKey[]).map((semester) => ({
+    semester,
+    label: SEMESTER_LABELS[semester],
+    subjects: selectedSubjects
+      .filter((subject) => subject.semester === semester || subject.semester === 'A')
+      .map(sub => {
+      const professors = [...new Set(
+        sub.groups.flatMap(g => g.professors?.length ? g.professors : [g.professor])
+      )].sort((a, b) => a.localeCompare(b, 'es'));
       return { id: sub.id, name: sub.name, professors };
-    })
-    .filter(s => s.professors.length > 1); // only show if there's a choice
+      }),
+  })).filter((group) => group.subjects.length > 0);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -109,8 +112,11 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
                 const blocked = isBlocked(day, block.start);
                 return (
                   <button
+                    type="button"
                     key={day}
                     onClick={() => toggleBlock(day, block)}
+                    aria-pressed={blocked}
+                    aria-label={`${blocked ? 'Desbloquear' : 'Bloquear'} ${DAYS[day]}, ${block.label}`}
                     className={`h-12 border-l border-border/30 transition-colors ${
                       blocked
                         ? 'bg-destructive/20 hover:bg-destructive/30'
@@ -146,33 +152,44 @@ const StepPreferences = ({ blockedTimes, setBlockedTimes, selectedSubjects, prof
           <span className="text-xs text-muted-foreground font-normal">(opcional — prioriza el grupo de ese profesor)</span>
         </h3>
 
-        {subjectsWithProfessors.length > 0 ? (
-          <div className="space-y-3 pl-4 border-l-2 border-primary/30">
-            {subjectsWithProfessors.map(sub => (
-              <div key={sub.id} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                <span className="text-sm text-foreground/80 min-w-[180px] truncate">{sub.name}</span>
-                <Select
-                  value={professorPrefs[sub.id] || '_any'}
-                  onValueChange={val =>
-                    setProfessorPrefs({ ...professorPrefs, [sub.id]: val === '_any' ? undefined : val })
-                  }
-                >
-                  <SelectTrigger className="h-8 text-xs w-full sm:w-[220px]">
-                    <SelectValue placeholder="Sin preferencia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="_any">Sin preferencia</SelectItem>
-                    {sub.professors.map(prof => (
-                      <SelectItem key={prof} value={prof}>{prof}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        {subjectsBySemester.length > 0 ? (
+          <div className="space-y-6 pl-4 border-l-2 border-primary/30">
+            {subjectsBySemester.map((semesterGroup) => (
+              <div key={semesterGroup.semester}>
+                <h4 className="mb-3 text-sm font-semibold text-foreground">{semesterGroup.label}</h4>
+                <div className="space-y-3">
+                  {semesterGroup.subjects.map(sub => (
+                    <div key={`${semesterGroup.semester}-${sub.id}`} className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                      <span className="text-sm text-foreground/80 min-w-[220px]">{sub.name}</span>
+                      {sub.professors.length > 1 ? (
+                        <Select
+                          value={professorPrefs[sub.id] || '_any'}
+                          onValueChange={val =>
+                            setProfessorPrefs({ ...professorPrefs, [sub.id]: val === '_any' ? undefined : val })
+                          }
+                        >
+                          <SelectTrigger className="h-8 text-xs w-full sm:w-[260px]">
+                            <SelectValue placeholder="Sin preferencia" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="_any">Sin preferencia</SelectItem>
+                            {sub.professors.map(prof => (
+                              <SelectItem key={prof} value={prof}>{prof}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Sin alternativas de profesor</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground italic">
-            Las asignaturas seleccionadas solo tienen un profesor disponible por grupo.
+            Selecciona asignaturas para ver sus profesores por cuatrimestre.
           </p>
         )}
       </div>

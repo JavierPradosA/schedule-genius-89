@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Subject, TimeBlock } from '@/data/demoData';
-import { generateSchedules, ScheduleOption } from '@/lib/scheduleGenerator';
+import { ScheduleOption } from '@/lib/scheduleGenerator';
+import { ChosenSemesterSchedule, generateSemesterSchedules, SemesterKey } from '@/lib/semesterSchedules';
 import { ProfessorPreferences } from '@/components/steps/StepPreferences';
 import WeekCalendar from '@/components/WeekCalendar';
 import { ArrowLeft, Check, AlertTriangle, Info } from 'lucide-react';
@@ -11,56 +12,13 @@ interface StepResultsProps {
   subjects: Subject[];
   blockedTimes: TimeBlock[];
   professorPrefs?: ProfessorPreferences;
-  onChoose: (schedule: ScheduleOption) => void;
+  onChoose: (schedules: ChosenSemesterSchedule[]) => void;
   onBack: () => void;
-}
-
-type SemesterKey = 'C1' | 'C2';
-
-const SEMESTER_LABELS: Record<SemesterKey, string> = {
-  C1: '1er cuatrimestre',
-  C2: '2º cuatrimestre',
-};
-
-const SEMESTER_SUFFIX: Record<SemesterKey, string> = {
-  C1: '(C1)',
-  C2: '(C2)',
-};
-
-function getSubjectsForSemester(subjects: Subject[], semester: SemesterKey): Subject[] {
-  return subjects.flatMap((subject) => {
-    if (subject.semester !== 'A' && subject.semester !== semester) {
-      return [];
-    }
-
-    if (subject.semester !== 'A') {
-      return [subject];
-    }
-
-    const hasTaggedGroups = subject.groups.some((group) => /\(C[12]\)/.test(group.name));
-    const groups = hasTaggedGroups
-      ? subject.groups.filter((group) => group.name.includes(SEMESTER_SUFFIX[semester]))
-      : subject.groups;
-
-    return [{
-      ...subject,
-      semester,
-      groups,
-    }];
-  });
 }
 
 const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack }: StepResultsProps) => {
   const semesterResults = useMemo(() => {
-    const semesters = (['C1', 'C2'] as SemesterKey[]).filter((semester) =>
-      subjects.some((subject) => subject.semester === semester || subject.semester === 'A')
-    );
-
-    return semesters.map((semester) => ({
-      semester,
-      label: SEMESTER_LABELS[semester],
-      ...generateSchedules(getSubjectsForSemester(subjects, semester), blockedTimes, professorPrefs),
-    }));
+    return generateSemesterSchedules(subjects, blockedTimes, professorPrefs);
   }, [subjects, blockedTimes, professorPrefs]);
 
   const [activeSemester, setActiveSemester] = useState<SemesterKey>('C1');
@@ -78,6 +36,14 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
     : 0;
   const current = activeResult?.options[currentIndex];
   const hasMultipleSemesters = semesterResults.length > 1;
+  const chosenSchedules = semesterResults.flatMap((result) => {
+    const optionIndex = Math.min(
+      selectedIdxBySemester[result.semester] ?? 0,
+      Math.max(result.options.length - 1, 0),
+    );
+    const schedule = result.options[optionIndex];
+    return schedule ? [{ semester: result.semester, label: result.label, schedule }] : [];
+  });
 
   if (!activeResult || activeResult.options.length === 0) {
     return (
@@ -93,8 +59,10 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {semesterResults.map((result) => (
               <button
+                type="button"
                 key={result.semester}
                 onClick={() => setActiveSemester(result.semester)}
+                aria-pressed={activeSemester === result.semester}
                 className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
                   activeSemester === result.semester
                     ? 'border-secondary bg-secondary/10 text-foreground'
@@ -144,8 +112,10 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
           <div className="flex flex-wrap gap-3">
             {semesterResults.map((result) => (
               <button
+                type="button"
                 key={result.semester}
                 onClick={() => setActiveSemester(result.semester)}
+                aria-pressed={activeSemester === result.semester}
                 className={`px-4 py-3 rounded-lg border-2 text-left transition-all ${
                   activeSemester === result.semester
                     ? 'border-secondary bg-secondary/10 shadow-card'
@@ -178,8 +148,10 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
       <div className="flex flex-wrap gap-3 mb-6">
         {activeResult.options.map((opt, i) => (
           <button
+            type="button"
             key={opt.id}
             onClick={() => setSelectedIdxBySemester((prev) => ({ ...prev, [activeResult.semester]: i }))}
+            aria-pressed={currentIndex === i}
             className={`px-4 py-3 rounded-lg border-2 text-left transition-all ${
               currentIndex === i
                 ? 'border-secondary bg-secondary/10 shadow-card'
@@ -207,6 +179,7 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
             {current.id === 'mornings' && 'Todas las clases son por la mañana, dejando las tardes completamente libres.'}
             {current.id === 'minimal-gaps' && 'Prioriza la menor cantidad de tiempo perdido entre clases.'}
             {current.id === 'alternative' && 'Una alternativa válida con diferente distribución de turnos.'}
+            {current.id === 'selection-only' && 'Puedes continuar con tu selección de asignaturas aunque todavía no haya horario/profesorado público cargado para este grado.'}
           </p>
         </motion.div>
       )}
@@ -215,7 +188,7 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
         <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
           <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
           <p className="text-sm text-foreground">
-            Este horario tiene <strong>{current.blockedViolations} clase(s) en franjas que bloqueaste</strong> porque no existe ningún turno que las evite. Se marcan con ⚠ en el calendario.
+            Este horario tiene <strong>{current.blockedViolations} clase(s) en franjas que bloqueaste</strong> porque no existe ningún turno que las evite. Se marcan con borde rojo en el calendario.
           </p>
         </div>
       )}
@@ -239,8 +212,8 @@ const StepResults = ({ subjects, blockedTimes, professorPrefs, onChoose, onBack 
         <Button variant="outline" onClick={onBack}>
           <ArrowLeft className="w-4 h-4 mr-1" /> Modificar
         </Button>
-        <Button onClick={() => onChoose(current)} className="gradient-gold text-primary font-semibold">
-          <Check className="w-4 h-4 mr-1" /> Aceptar este horario
+        <Button onClick={() => onChoose(chosenSchedules)} className="gradient-gold text-primary font-semibold">
+          <Check className="w-4 h-4 mr-1" /> Aceptar horarios
         </Button>
       </div>
     </div>
